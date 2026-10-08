@@ -5,6 +5,7 @@ import com.example.shop.dto.ProductDtos.ProductRequest;
 import com.example.shop.dto.ProductDtos.ProductResponse;
 import com.example.shop.dto.ProductDtos.SuggestionResponse;
 import com.example.shop.service.ProductService;
+import com.example.shop.service.RecentlyViewedService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,7 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
+    private final RecentlyViewedService recentlyViewedService;
 
     @GetMapping
     public PageResponse<ProductResponse> list(
@@ -44,7 +46,9 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ProductResponse one(@PathVariable Long id) {
-        return productService.get(id);
+        ProductResponse product = productService.get(id);
+        recentlyViewedService.record(id);
+        return product;
     }
 
     @GetMapping("/suggestions")

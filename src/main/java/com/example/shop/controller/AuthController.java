@@ -1,6 +1,7 @@
 package com.example.shop.controller;
 
 import com.example.shop.dto.AuthDtos.AuthResponse;
+import com.example.shop.dto.AuthDtos.GoogleLoginRequest;
 import com.example.shop.dto.AuthDtos.LoginRequest;
 import com.example.shop.dto.AuthDtos.RegisterRequest;
 import com.example.shop.exception.BadRequestException;
@@ -32,6 +33,11 @@ public class AuthController {
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
+    }
+
+    @PostMapping("/google")
+    public AuthResponse google(@Valid @RequestBody GoogleLoginRequest request) {
+        return authService.loginWithGoogle(request);
     }
 
     @PostMapping("/logout")
