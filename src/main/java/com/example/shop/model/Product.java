@@ -1,9 +1,6 @@
 package com.example.shop.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -67,6 +64,12 @@ public class Product {
     public void setStock(int stock) {
         this.stock = stock;
     }
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    public  Category getCategory() {return category; }
+    public void setCategory(Category category) { this.category = category; }
 
     public Product() {
 

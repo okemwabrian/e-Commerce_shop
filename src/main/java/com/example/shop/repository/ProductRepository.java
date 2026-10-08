@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByNameContainingIgnoreCase(String name);
+    List<Product> findByCategoryId(Long categoryId);
 
 }
-//we dont have SQL, no implentation, we can save the products,find, delete and alsso serch
