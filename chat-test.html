@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+<h3>Chat test</h3>
+<input id="token" size="70" placeholder="paste JWT token">
+<label><input type="checkbox" id="agent"> I am an agent</label>
+<button onclick="connect()">Connect</button><br><br>
+<input id="customerId" placeholder="customerId (agents only)">
+<input id="msg" size="40" placeholder="message">
+<button onclick="sendMsg()">Send</button>
+<pre id="log"></pre>
+<script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7/bundles/stomp.umd.min.js"></script>
+<script>
+let client;
+function log(text) {
+  document.getElementById('log').textContent += text + '\n';
+}
+function connect() {
+  client = new StompJs.Client({
+    brokerURL: 'ws://localhost:8080/ws',
+    connectHeaders: {
+      Authorization: 'Bearer ' + document.getElementById('token').value
+    },
+    onConnect: () => {
+      log('connected');
+      client.subscribe('/user/queue/chat', message => log('CHAT: ' + message.body));
+      client.subscribe('/user/queue/notifications', message => log('NOTIFICATION: ' + message.body));
+      if (document.getElementById('agent').checked) {
+        client.subscribe('/topic/support', message => log('SUPPORT FEED: ' + message.body));
+      }
+    },
+    onStompError: frame => log('ERROR: ' + frame.headers['message'])
+  });
+  client.activate();
+}
+function sendMsg() {
+  const id = document.getElementById('customerId').value;
+  client.publish({
+    destination: '/app/chat.send',
+    body: JSON.stringify({
+      customerId: id ? Number(id) : null,
+      content: document.getElementById('msg').value
+    })
+  });
+}
+</script>
+</body>
+</html>
