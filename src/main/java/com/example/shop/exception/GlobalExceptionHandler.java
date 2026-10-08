@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -49,6 +51,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> integrity(DataIntegrityViolationException ex) {
         return build(HttpStatus.CONFLICT,
                 "This record conflicts with existing data (duplicate or in use).", null);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiError> badCredentials(BadCredentialsException ex) {
+        return build(HttpStatus.UNAUTHORIZED, ex.getMessage(), null);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiError> denied(AccessDeniedException ex) {
+        return build(HttpStatus.FORBIDDEN, "You do not have permission to do this", null);
     }
 
     private ResponseEntity<ApiError> build(HttpStatus status, String message,

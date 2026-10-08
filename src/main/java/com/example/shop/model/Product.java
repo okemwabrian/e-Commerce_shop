@@ -38,10 +38,12 @@ public class Product {
     private int stock;
     private String brand;
     private String imageUrl;
+    @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean active = true;
     private LocalDateTime createdAt;
 
     @Version
+    @Column(nullable = false, columnDefinition = "bigint default 0")
     private Long version;
 
     @ManyToOne(fetch = FetchType.LAZY)
