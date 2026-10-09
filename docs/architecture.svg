@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="220" viewBox="0 0 900 220" role="img" aria-labelledby="title desc">
+  <title id="title">Shop backend architecture</title>
+  <desc id="desc">Client requests pass through JWT security, controllers, services, repositories, and PostgreSQL.</desc>
+  <defs>
+    <style>
+      .box { fill: #f5f8ff; stroke: #315b9a; stroke-width: 2; rx: 12; }
+      .label { font: 16px sans-serif; fill: #152238; text-anchor: middle; }
+      .arrow { stroke: #315b9a; stroke-width: 2.5; marker-end: url(#head); }
+    </style>
+    <marker id="head" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 z" fill="#315b9a" />
+    </marker>
+  </defs>
+  <rect class="box" x="20" y="75" width="130" height="70" />
+  <text class="label" x="85" y="116">Client</text>
+  <rect class="box" x="195" y="75" width="150" height="70" />
+  <text class="label" x="270" y="106">JWT Security</text><text class="label" x="270" y="128">and roles</text>
+  <rect class="box" x="390" y="75" width="140" height="70" />
+  <text class="label" x="460" y="116">Controllers</text>
+  <rect class="box" x="575" y="75" width="130" height="70" />
+  <text class="label" x="640" y="116">Services</text>
+  <rect class="box" x="750" y="75" width="130" height="70" />
+  <text class="label" x="815" y="106">Repositories</text><text class="label" x="815" y="128">and PostgreSQL</text>
+  <line class="arrow" x1="150" y1="110" x2="188" y2="110" />
+  <line class="arrow" x1="345" y1="110" x2="383" y2="110" />
+  <line class="arrow" x1="530" y1="110" x2="568" y2="110" />
+  <line class="arrow" x1="705" y1="110" x2="743" y2="110" />
+</svg>
