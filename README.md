@@ -2,7 +2,7 @@
 
 REST API and real-time backend for an online shop, built with **Spring Boot**, **Spring Security (JWT)**, **Spring Data JPA**, and **PostgreSQL**. Customers can browse products, manage a cart and wishlist, place orders, chat with support, and receive live notifications. Admins and support agents manage the shop.
 
-The matching React frontend is in a separate repository: [shop-frontend](https://github.com/YOUR_USERNAME/shop-frontend) *(replace this URL with the frontend repository link).* 
+The matching React frontend is in a separate repository: [shop-frontend](https://github.com/okemwabrian/shop-frontend.git)  
 
 ![Shop backend architecture](docs/architecture.svg)
 
