@@ -34,7 +34,7 @@ public class SecurityConfig {
     private final AppUserRepository users;
     private final RevokedTokenRepository revoked;
 
-    @Value("${app.cors.allowed-origins}")
+    @Value("${app.cors.allowed-origins:https://shoplin.netlify.app,http://localhost:5173}")
     private List<String> allowedOrigins;
 
     @Bean
@@ -83,6 +83,7 @@ public class SecurityConfig {
                 "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
