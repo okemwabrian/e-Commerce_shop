@@ -1,13 +1,17 @@
-# ---------- stage 1: build the jar ----------
-FROM maven:3.9-eclipse-temurin-21 AS build
+# Stage 1: Build the application
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY pom.xml .
+RUN mvn dependency:go-offline -B
 COPY src ./src
-RUN mvn -q -DskipTests package
+RUN mvn clean package -DskipTests
 
-# ---------- stage 2: run it ----------
-FROM eclipse-temurin:21-jre
+# Stage 2: Run the application
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
+
+# Render assigns PORT at runtime; keep 8080 as the local default.
+ENV PORT=8080
 EXPOSE 8080
-ENTRYPOINT ["java", "-XX:MaxRAMPercentage=60", "-XX:+UseSerialGC", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT:-8080} -jar app.jar"]
