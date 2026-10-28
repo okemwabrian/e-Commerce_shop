@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.ZoneId;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -33,6 +34,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 if (!revoked.existsById(claims.getId())) {
                     users.findByEmail(claims.getSubject())
                             .filter(user -> user.isEnabled())
+                            .filter(user -> user.getPasswordChangedAt() == null
+                                    || claims.getIssuedAt() != null
+                                    && claims.getIssuedAt().toInstant().isAfter(
+                                    user.getPasswordChangedAt()
+                                            .atZone(ZoneId.systemDefault()).toInstant()))
                             .ifPresent(user -> {
                                 var authentication = new UsernamePasswordAuthenticationToken(
                                         user.getEmail(), null,

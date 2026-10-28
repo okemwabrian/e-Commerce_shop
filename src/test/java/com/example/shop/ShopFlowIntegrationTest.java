@@ -1,9 +1,13 @@
 package com.example.shop;
 
 import com.example.shop.model.Category;
+import com.example.shop.model.AppUser;
 import com.example.shop.model.Product;
+import com.example.shop.model.Role;
+import com.example.shop.repository.AppUserRepository;
 import com.example.shop.repository.CategoryRepository;
 import com.example.shop.repository.ProductRepository;
+import com.example.shop.security.JwtService;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -36,6 +41,15 @@ class ShopFlowIntegrationTest {
 
     @Autowired
     private CategoryRepository categories;
+
+    @Autowired
+    private AppUserRepository users;
+
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private Long productId;
 
@@ -76,6 +90,48 @@ class ShopFlowIntegrationTest {
         String token = registerAndGetToken();
         mvc.perform(post("/api/products")
                         .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void customerCannotReadAnotherCustomersOrder() throws Exception {
+        String ownerAuthorization = "Bearer " + registerAndGetToken();
+        mvc.perform(post("/api/cart/items")
+                        .header("Authorization", ownerAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"productId\":" + productId + ",\"quantity\":1}"))
+                .andExpect(status().isOk());
+        String checkout = """
+                {"shippingName":"Test","shippingPhone":"0712345678",
+                "shippingAddress":"Street 1","shippingCity":"Nairobi",
+                "paymentMethod":"CASH_ON_DELIVERY"}
+                """;
+        MvcResult orderResult = mvc.perform(post("/api/orders")
+                        .header("Authorization", ownerAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(checkout))
+                .andExpect(status().isCreated())
+                .andReturn();
+        Number orderId = JsonPath.read(orderResult.getResponse().getContentAsString(), "$.id");
+
+        mvc.perform(get("/api/orders/{id}", orderId.longValue())
+                        .header("Authorization", "Bearer " + registerAndGetToken()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void supportCannotManageProducts() throws Exception {
+        AppUser support = new AppUser();
+        support.setFullName("Support Agent");
+        support.setEmail(UUID.randomUUID() + "@test.com");
+        support.setPassword(passwordEncoder.encode("TestPassword123"));
+        support.setRole(Role.SUPPORT);
+        support = users.save(support);
+
+        mvc.perform(post("/api/products")
+                        .header("Authorization", "Bearer " + jwtService.generate(support))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
                 .andExpect(status().isForbidden());

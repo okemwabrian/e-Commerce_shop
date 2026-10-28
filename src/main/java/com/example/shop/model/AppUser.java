@@ -44,4 +44,5 @@ public class AppUser {
     private boolean marketingConsent;
     private String authProvider = "LOCAL";
     private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime passwordChangedAt;
 }

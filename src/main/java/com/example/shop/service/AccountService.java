@@ -43,6 +43,7 @@ public class AccountService {
             throw new BadRequestException("Current password is incorrect");
         }
         user.setPassword(encoder.encode(request.newPassword()));
+        user.setPasswordChangedAt(java.time.LocalDateTime.now().withNano(0));
     }
 
     public void deactivate(DeactivateRequest request) {

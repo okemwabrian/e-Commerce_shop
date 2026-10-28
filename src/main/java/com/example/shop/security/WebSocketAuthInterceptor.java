@@ -19,6 +19,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.time.ZoneId;
 
 @Component
 @RequiredArgsConstructor
@@ -67,6 +68,11 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
             }
             AppUser user = users.findByEmail(claims.getSubject())
                     .filter(AppUser::isEnabled)
+                    .filter(candidate -> candidate.getPasswordChangedAt() == null
+                            || claims.getIssuedAt() != null
+                            && claims.getIssuedAt().toInstant().isAfter(
+                            candidate.getPasswordChangedAt()
+                                    .atZone(ZoneId.systemDefault()).toInstant()))
                     .orElseThrow(() -> new MessagingException("Unknown or disabled user"));
             accessor.setUser(new UsernamePasswordAuthenticationToken(user.getEmail(), null,
                     List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))));
